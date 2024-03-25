@@ -1,5 +1,6 @@
 import { startTransition } from "react";
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const ContainerStyle = {
   display: "flex",
@@ -9,6 +10,16 @@ const ContainerStyle = {
 
 const StarContainerStyle = {
   display: "flex",
+};
+
+StarRating.propTypes = {
+  maxRating: PropTypes.number,
+  color: PropTypes.string,
+  size: PropTypes.number,
+  className: PropTypes.string,
+  defaultRating: PropTypes.number,
+  messages: PropTypes.array,
+  onSetRating: PropTypes.func,
 };
 
 export default function StarRating({
