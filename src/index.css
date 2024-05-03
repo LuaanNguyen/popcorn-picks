@@ -49,6 +49,12 @@ body {
   justify-content: center;
 }
 
+.box::-webkit-scrollbar,
+.list::-webkit-scrollbar {
+  display: none;
+  scroll-behavior: smooth;
+}
+
 .box {
   width: 42rem;
   max-width: 42rem;
