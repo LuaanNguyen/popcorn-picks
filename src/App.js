@@ -65,9 +65,9 @@ function Search({ query, setQuery }) {
 
 function Logo() {
   return (
-    <div className="logo">
+    <div onClick={() => window.location.reload()} className="logo">
       <span role="img">🍿</span>
-      <h1>Popcorn</h1>
+      <h1>Popcorn Picks</h1>
     </div>
   );
 }

@@ -99,6 +99,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.8rem;
+  cursor: pointer;
 }
 
 .logo span {
@@ -340,10 +341,11 @@ body {
 }
 
 .btn-back {
-  position: absolute;
+  position: sticky;
   bottom: 7%;
   left: 44%;
   height: 5rem;
+  width: 5rem;
   aspect-ratio: 1;
   border-radius: 50%;
   border: none;
