@@ -279,7 +279,7 @@ function WatchedSummary({ watched }) {
   const avgRuntime = average(watched.map((movie) => movie.runtime));
   return (
     <div className="summary">
-      <h2>Movies you watched</h2>
+      <h2>Movies you've watched</h2>
       <div>
         <p>
           <span>#️⃣</span>
@@ -459,6 +459,7 @@ export default function App() {
           )}
           {error && <ErrorMessage message={error} />}
         </Box>
+
         <Box>
           <>
             {selectedId ? (
