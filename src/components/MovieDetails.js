@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Loader from "./Loader";
 import StarRating from "./StarRating";
-import { KEY } from "../App";
+const API_KEY = process.env.REACT_APP_API_KEY;
 
 export default function MovieDetails({
   selectedId,
@@ -47,10 +47,25 @@ export default function MovieDetails({
 
   useEffect(
     function () {
+      function callback(e) {
+        if (e.code === "Escape") {
+          onCloseMovie();
+        }
+      }
+      document.addEventListener("keydown", callback);
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [onCloseMovie]
+  );
+
+  useEffect(
+    function () {
       async function getMovieDetails() {
         setIsLoading(true);
         const res = await fetch(
-          `http://www.omdbapi.com/?i=${selectedId}&apikey=${KEY}`
+          `http://www.omdbapi.com/?i=${selectedId}&apikey=${API_KEY}`
         );
         const data = await res.json();
         setMovie(data);

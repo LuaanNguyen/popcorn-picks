@@ -1,66 +1,19 @@
 import { useEffect, useState } from "react";
-import StarRating from "./components/StarRating";
-import tempMovieData from "./TempData";
 import Search from "./components/Search";
 import Navbar from "./components/Navbar";
 import WatchedMovieList from "./components/WatchedMoviesList";
 import WatchedSummary from "./components/WatchedSummary";
 import Loader from "./components/Loader";
 import MovieDetails from "./components/MovieDetails";
-
-export const KEY = "72c7a217";
-
-function NumResults({ movies }) {
-  return (
-    <p className="num-results">
-      Found <strong>{movies.length}</strong> results
-    </p>
-  );
-}
-
-function MovieList({ movies, onSelectMovie }) {
-  return (
-    <ul className="list list-movies">
-      {movies?.map((movie) => (
-        <Movie movie={movie} key={movie.imdbID} onSelectMovie={onSelectMovie} />
-      ))}
-    </ul>
-  );
-}
-
-function Movie({ movie, onSelectMovie }) {
-  return (
-    <li key={movie.imdbID} onClick={() => onSelectMovie(movie.imdbID)}>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
-      <div>
-        <p>
-          <span>🗓</span>
-          <span>{movie.Year}</span>
-        </p>
-      </div>
-    </li>
-  );
-}
-
-function Box({ children }) {
-  const [isOpen, setIsOpen] = useState(true);
-
-  return (
-    <div className="box">
-      <button className="btn-toggle" onClick={() => setIsOpen((open) => !open)}>
-        {isOpen ? "–" : "+"}
-      </button>
-
-      {isOpen && children}
-    </div>
-  );
-}
+import NumResults from "./components/NumResults";
+import Box from "./components/Box";
+import MovieList from "./components/MovieList";
+import { tempMovieData } from "./TempData";
+const API_KEY = process.env.REACT_APP_API_KEY;
 
 // function WatchBox() {
 //   const [watched, setWatched] = useState(tempWatchedData);
 //   const [isOpen2, setIsOpen2] = useState(true);
-
 //   return (
 //     <div className="box">
 //       <button
@@ -90,7 +43,6 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
-  const tempQuery = "interstellar";
 
   const handleSelectMovie = (id) => {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -116,7 +68,7 @@ export default function App() {
           setIsLoading(true);
           setError(""); //reset the error state everytime the component is re-rendered
           const res = await fetch(
-            `http://www.omdbapi.com/?s=${query}&apikey=${KEY}`,
+            `http://www.omdbapi.com/?s=${query}&apikey=${API_KEY}`,
             { signal: controller.signal }
           );
 
@@ -157,14 +109,6 @@ export default function App() {
     [query] //everytime query changes, we will have a re-render of the components
   );
 
-  // useEffect(function () {
-  //   fetch(`http://www.omdbapi.com/?s=interstellar&apikey=${KEY}`)
-  //     .then((res) => res.json())
-  //     .then((data) => setMovies(data.Search));
-
-  //   return () => console.log("Clean Up");
-  // }, []);
-
   return (
     <>
       <Navbar>
@@ -173,17 +117,20 @@ export default function App() {
       </Navbar>
 
       <Main>
-        {/* <Box element={<MovieList movies={movies} />} />
-        <Box
-          element={
-            <>
-              <WatchedSummary watched={watched} />
-              <WatchedMovieList watched={watched} />
-            </>
-          }
-        /> */}
         <Box>
-          {/* {isLoading ? <Loader /> : <MovieList movies={movies} />} */}
+          {!query && (
+            <>
+              <div className="summary">
+                <h2 className="">
+                  Start using the Search to find your favorite movies. 🔎
+                </h2>
+              </div>
+              <MovieList
+                onSelectMovie={handleSelectMovie}
+                movies={tempMovieData}
+              />
+            </>
+          )}
           {isLoading && <Loader />}
           {!isLoading && !error && (
             <MovieList onSelectMovie={handleSelectMovie} movies={movies} />
