@@ -203,6 +203,19 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     [selectedId]
   );
 
+  useEffect(
+    function () {
+      if (!title) return;
+      document.title = `Movie | ${title}`;
+
+      return function () {
+        document.title = "usePopcorn";
+        console.log(`Clean Up effect for movie ${title}`); //JavaScript concept: closure
+      };
+    },
+    [title]
+  );
+
   return (
     <div className="details">
       {isLoading ? (
@@ -210,9 +223,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
       ) : (
         <>
           <header>
-            <button className="btn-back" onClick={onCloseMovie}>
-              &larr;
-            </button>
             <img src={poster} alt={`Poster of ${movie} movie.`}></img>
             <div className="details-overview">
               <h2>{title}</h2>
@@ -253,6 +263,9 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
             </p>
             <p>Starring {actors}</p>
             <p>Directed by {director}</p>
+            <button className="btn-back" onClick={onCloseMovie}>
+              &larr;
+            </button>
           </section>
         </>
       )}
@@ -366,12 +379,14 @@ export default function App() {
 
   useEffect(
     function () {
+      const controller = new AbortController(); //browser api (same as fetch)
       async function fetchMovies() {
         try {
           setIsLoading(true);
           setError(""); //reset the error state everytime the component is re-rendered
           const res = await fetch(
-            `http://www.omdbapi.com/?s=${query}&apikey=${KEY}`
+            `http://www.omdbapi.com/?s=${query}&apikey=${KEY}`,
+            { signal: controller.signal }
           );
 
           if (!res.ok) {
@@ -380,12 +395,15 @@ export default function App() {
 
           const data = await res.json();
 
-          if (data.Response === "False") throw new Error("Movie not found!");
+          if (data.Response === "False") throw new Error("❌ Movie not found!");
 
           setMovies(data.Search);
+          setError("");
         } catch (err) {
           console.log(err.message);
-          setError(err.message);
+          if (err.name !== "AbprtError") {
+            setError(err.message);
+          }
         } finally {
           setIsLoading(false);
         }
@@ -399,6 +417,11 @@ export default function App() {
       }
 
       fetchMovies();
+
+      return function () {
+        //clean up function
+        controller.abort();
+      };
     },
     [query] //everytime query changes, we will have a re-render of the components
   );
