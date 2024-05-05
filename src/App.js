@@ -9,7 +9,7 @@ import NumResults from "./components/NumResults";
 import Box from "./components/Box";
 import MovieList from "./components/MovieList";
 import { tempMovieData } from "./TempData";
-const API_KEY = process.env.REACT_APP_API_KEY;
+import { useMovies } from "./useMovies";
 
 // function WatchBox() {
 //   const [watched, setWatched] = useState(tempWatchedData);
@@ -38,11 +38,9 @@ function Main({ children }) {
 
 export default function App() {
   const [query, setQuery] = useState("");
-  const [movies, setMovies] = useState([]);
-  //const [watched, setWatched] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+  //const [watched, setWatched] = useState([]);
+  const { movies, isLoading, error } = useMovies(query);
 
   //store the local value inside a state on the initial render ( to save watched items)
   const [watched, setWatched] = useState(function () {
@@ -71,55 +69,6 @@ export default function App() {
       localStorage.setItem("watched", JSON.stringify(watched)); //storing movies into local storage
     },
     [watched]
-  );
-
-  useEffect(
-    function () {
-      const controller = new AbortController(); //browser api (same as fetch)
-      async function fetchMovies() {
-        try {
-          setIsLoading(true);
-          setError(""); //reset the error state everytime the component is re-rendered
-          const res = await fetch(
-            `http://www.omdbapi.com/?s=${query}&apikey=${API_KEY}`,
-            { signal: controller.signal }
-          );
-
-          if (!res.ok) {
-            throw new Error("Something went wrong with fetching movies");
-          }
-
-          const data = await res.json();
-
-          if (data.Response === "False") throw new Error("❌ Movie not found!");
-
-          setMovies(data.Search);
-          setError("");
-        } catch (err) {
-          console.log(err.message);
-          if (err.name !== "AbortError") {
-            setError(err.message);
-          }
-        } finally {
-          setIsLoading(false);
-        }
-      }
-
-      if (query.length < 3) {
-        //if the query (# of words in the search box is less than 3, we're not rendering)
-        setMovies([]);
-        setError("");
-        return;
-      }
-
-      fetchMovies();
-
-      return function () {
-        //clean up function
-        controller.abort();
-      };
-    },
-    [query] //everytime query changes, we will have a re-render of the components
   );
 
   return (

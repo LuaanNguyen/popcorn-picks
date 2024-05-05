@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Loader from "./Loader";
 import StarRating from "./StarRating";
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -16,6 +16,15 @@ export default function MovieDetails({
   const watchedUserRating = watched.find(
     (movie) => movie.imdbID === selectedId
   )?.userRating;
+
+  const countRef = useRef(0); //sotre the amount of click before the user set the rating
+
+  useEffect(
+    function () {
+      if (userRating) countRef.current = countRef.current + 1;
+    },
+    [userRating]
+  );
 
   const {
     Title: title,
@@ -39,6 +48,7 @@ export default function MovieDetails({
       imdbRating: Number(imdbRating),
       runtime: Number(runtime.split(" ").at(0)),
       userRating,
+      countRatingDecisions: countRef.current,
     };
 
     onAddWatched(newWatchedMovie);
