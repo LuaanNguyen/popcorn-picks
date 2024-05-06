@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Search from "./components/Search";
 import Navbar from "./components/Navbar";
 import WatchedMovieList from "./components/WatchedMoviesList";
@@ -10,6 +10,7 @@ import Box from "./components/Box";
 import MovieList from "./components/MovieList";
 import { tempMovieData } from "./TempData";
 import { useMovies } from "./useMovies";
+import { useLocalStorageStage } from "./useLocalStorageState";
 
 // function WatchBox() {
 //   const [watched, setWatched] = useState(tempWatchedData);
@@ -41,12 +42,7 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null);
   //const [watched, setWatched] = useState([]);
   const { movies, isLoading, error } = useMovies(query);
-
-  //store the local value inside a state on the initial render ( to save watched items)
-  const [watched, setWatched] = useState(function () {
-    const storedValue = localStorage.getItem("watched");
-    return JSON.parse(storedValue);
-  });
+  const [watched, setWatched] = useLocalStorageStage([], "watched");
 
   const handleSelectMovie = (id) => {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -63,13 +59,6 @@ export default function App() {
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
-
-  useEffect(
-    function () {
-      localStorage.setItem("watched", JSON.stringify(watched)); //storing movies into local storage
-    },
-    [watched]
-  );
 
   return (
     <>
